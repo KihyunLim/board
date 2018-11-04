@@ -29,4 +29,5 @@ SET SQL_SAFE_UPDATES=0;
 delete from board.article;
 delete from board.article_content;
 
+-- 데이터를 삭제해도 자동으로 증가한 값이 남아있어 초기화 필요
 alter table board.article auto_increment = 1;
