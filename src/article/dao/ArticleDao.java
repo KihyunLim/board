@@ -80,15 +80,48 @@ public class ArticleDao {
 		}
 	}
 	
+	public Article selectById(Connection conn, int no) throws SQLException {
+		PreparedStatement pstmt = null;
+		ResultSet rs = null;
+		try {
+			pstmt = conn.prepareStatement("select * from article where article_no = ?");
+			pstmt.setInt(1, no);
+			rs = pstmt.executeQuery();
+			Article article = null;
+			if (rs.next()) {
+				article = convertArticle(rs);
+			}
+			return article;
+		} finally {
+			jdbcUtil.close(rs);
+			jdbcUtil.close(pstmt);
+		}
+	}
+	
+	public void increaseReadCount(Connection conn, int no) throws SQLException {
+		try (PreparedStatement pstmt = conn.prepareStatement("update article set read_cnt = read_cnt + 1 " + "where article_no = ?")) {
+			pstmt.setInt(1, no);
+			pstmt.executeUpdate();
+		}
+	}
+	
+	public int update(Connection conn, int no , String title) throws SQLException {
+		try (PreparedStatement pstmt = conn.prepareStatement("update article set title = ?, moddate = now() " + "where article_no = ?")) {
+			pstmt.setString(1, title);
+			pstmt.setInt(2, no);
+			return pstmt.executeUpdate();
+		}
+	}
+	
+	private Timestamp toTimestamp(Date date) {
+		return new Timestamp(date.getTime());
+	}
+	
 	private Article convertArticle(ResultSet rs) throws SQLException {
 		return new Article(rs.getInt("article_no"), new Writer(rs.getString("writer_id"), rs.getString("writer_name")), rs.getString("title"), toDate(rs.getTimestamp("regdate")), toDate(rs.getTimestamp("moddate")), rs.getInt("read_cnt"));
 	}
 	
 	private Date toDate(Timestamp timestamp) {
 		return new Date(timestamp.getTime());
-	}
-	
-	private Timestamp toTimestamp(Date date) {
-		return new Timestamp(date.getTime());
 	}
 }
