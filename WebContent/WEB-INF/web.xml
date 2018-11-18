@@ -59,5 +59,7 @@
 		<url-pattern>/changePwd.do</url-pattern>
 		<url-pattern>/article/write.do</url-pattern>
 		<url-pattern>/article/modify.do</url-pattern>
+		<url-pattern>/article/delFlagUpdate.do</url-pattern>
+		<url-pattern>/article/delete.do</url-pattern>
 	</filter-mapping>
 </web-app>

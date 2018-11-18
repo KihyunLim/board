@@ -21,7 +21,7 @@ public class ArticleDao {
 		Statement stmt = null;
 		ResultSet rs = null;
 		try {
-			pstmt = conn.prepareStatement("insert into article " + "(writer_id, writer_name, title, regdate, moddate, read_cnt) " + "values (?,?,?,?,?,0)");
+			pstmt = conn.prepareStatement("insert into article " + "(writer_id, writer_name, title, regdate, moddate, read_cnt, del_flag) " + "values (?,?,?,?,?,0, false)");
 			pstmt.setString(1, article.getWriter().getId());
 			pstmt.setString(2, article.getWriter().getName());
 			pstmt.setString(3, article.getTitle());
@@ -50,7 +50,7 @@ public class ArticleDao {
 		ResultSet rs = null;
 		try {
 			stmt = conn.createStatement();
-			rs = stmt.executeQuery("select count(*) from article");
+			rs = stmt.executeQuery("select count(*) from article where del_flag <> true");
 			if (rs.next()) {
 				return rs.getInt(1);
 			}
@@ -65,7 +65,7 @@ public class ArticleDao {
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
 		try {
-			pstmt = conn.prepareStatement("select * from article " + "order by article_no desc limit ?, ?");
+			pstmt = conn.prepareStatement("select * from article  where del_flag <> true " + "order by article_no desc limit ?, ?");
 			pstmt.setInt(1, startRow);
 			pstmt.setInt(2, size);
 			rs = pstmt.executeQuery();
@@ -84,7 +84,7 @@ public class ArticleDao {
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
 		try {
-			pstmt = conn.prepareStatement("select * from article where article_no = ?");
+			pstmt = conn.prepareStatement("select * from article where article_no = ? and del_flag <> true");
 			pstmt.setInt(1, no);
 			rs = pstmt.executeQuery();
 			Article article = null;
@@ -105,11 +105,25 @@ public class ArticleDao {
 		}
 	}
 	
-	public int update(Connection conn, int no , String title) throws SQLException {
+	public int update(Connection conn, int no, String title) throws SQLException {
 		try (PreparedStatement pstmt = conn.prepareStatement("update article set title = ?, moddate = now() " + "where article_no = ?")) {
 			pstmt.setString(1, title);
 			pstmt.setInt(2, no);
 			return pstmt.executeUpdate();
+		}
+	}
+	
+	public void delFlagUpdate(Connection conn, int no) throws SQLException {
+		try (PreparedStatement pstmt = conn.prepareStatement("update article set del_flag = true " + "where article_no = ?")) {
+			pstmt.setInt(1, no);
+			pstmt.executeUpdate();
+		}
+	}
+	
+	public void delete(Connection conn, int no) throws SQLException {
+		try (PreparedStatement pstmt = conn.prepareStatement("delete from article where article_no = ?")) {
+			pstmt.setInt(1, no);
+			pstmt.executeUpdate();
 		}
 	}
 	

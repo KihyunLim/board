@@ -31,3 +31,6 @@ delete from board.article_content;
 
 -- 데이터를 삭제해도 자동으로 증가한 값이 남아있어 초기화 필요
 alter table board.article auto_increment = 1;
+
+alter table board.article add del_flag boolean default false;
+update board.article set del_flag=true where article_no=2;

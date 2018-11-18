@@ -67,7 +67,6 @@ public class ModifyArticleHandler implements CommandHandler {
 		
 		ModifyRequest modReq = new ModifyRequest(authUser.getId(), no, req.getParameter("title"), req.getParameter("content"));
 		req.setAttribute("modReq", modReq);
-		System.out.println(modReq.getArticleNumber());
 		Map<String, Boolean> errors = new HashMap<>();
 		req.setAttribute("errors", errors);
 		modReq.validate(errors);
